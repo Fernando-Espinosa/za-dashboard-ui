@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import { PatientDashboard } from '../PatientDashboard';
 
 const drawerWidth = 240;
 
@@ -73,7 +73,7 @@ const AppBar = styled(MuiAppBar, {
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
+  // alignItems: 'center',
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
@@ -152,6 +152,7 @@ export const MasterView = () => {
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
+        <PatientDashboard />
       </Main>
     </Box>
   );
