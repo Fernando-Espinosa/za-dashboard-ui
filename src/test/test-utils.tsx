@@ -3,6 +3,7 @@ import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import filtersReducer from '../store/filtersSlice';
 
 // Create a custom render function that includes providers
 const queryClient = new QueryClient({
@@ -18,6 +19,7 @@ const createTestStore = () =>
   configureStore({
     reducer: {
       // Add your reducers here when you have them
+      filters: filtersReducer,
     },
   });
 

@@ -49,7 +49,7 @@ export const DashboardView = () => {
     return (
       <Box>
         {/* Skeleton for the summary cards */}
-        <Paper sx={skeletonContainerStyles}>
+        <Paper sx={skeletonContainerStyles} data-testid="skeleton-container">
           <Box sx={skeletonBoxStyles}>
             {[1, 2, 3].map((item) => (
               <Skeleton
