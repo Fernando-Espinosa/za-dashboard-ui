@@ -12,6 +12,11 @@ import {
 import { PATIENT_DASHBOARD_MESSAGES as Messages } from './userFacingMessages';
 import { PatientRow } from '../../hooks/useInitialPatients';
 import { useEchoWebSocket } from '../../hooks/useMockWebSocket';
+import {
+  highlightStyle,
+  realTimeColumnStyle,
+  tableStyle,
+} from './PatientDashboard.styles';
 
 const PAGE_SIZE = 10;
 
@@ -76,18 +81,9 @@ export const PatientDashboardTable = ({ rows }: Props) => {
   const isHighlighted = (name: string, field: keyof PatientRow) =>
     highlightMap[name]?.includes(field);
 
-  const highlightStyle = {
-    transition: 'background-color 0.3s ease',
-    backgroundColor: '#fff9c4',
-  };
-
-  const realTimeColumnStyle = {
-    backgroundColor: '#f1f8ff',
-  };
-
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label={TABLE.ARIA_LABEL}>
+      <Table sx={tableStyle} aria-label={TABLE.ARIA_LABEL}>
         <TableHead>
           <TableRow>
             <TableCell>{TABLE.HEADERS.NAME}</TableCell>
