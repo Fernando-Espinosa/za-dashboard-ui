@@ -1,55 +1,157 @@
-# React + TypeScript + Vite
+Let me explore the project structure to provide a detailed design document.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ran tool
+Let me examine the package.json to understand the dependencies and libraries used:
 
-Currently, two official plugins are available:
+Read file: package.json
+Now, let me check the structure of the src directory to understand the application's organization:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Ran tool
+Let me see what hooks are available to understand state management approach:
 
-## Expanding the ESLint configuration
+Ran tool
+Let me examine one of the hooks to understand the state management:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Read file: src/hooks/useInitialPatients.tsx
+Now let me check the WebSocket hook to understand real-time updates:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Read file: src/hooks/useMockWebSocket.tsx
+Let me check the main App component to understand the application structure:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Read file: src/App.tsx
+Let me look at the MasterView module:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Ran tool
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-# za-dashboard-ui
+Read file: src/modules/MasterView/index.tsx
+Let me look at the DashboardView component:
+
+Read file: src/modules/MasterView/DashboardView.tsx
+Let me check the PatientsSummary component:
+
+Read file: src/modules/PatientsSummary/index.tsx
+Based on my exploration of the codebase, I now have enough information to create a document about the design process, tools choice, scaling considerations, and future enhancements.
+
+# ZA Dashboard UI - Design Documentation
+
+## Design Process
+
+### Architecture
+
+- **Component-Based Structure:** The application follows a modular architecture with well-defined components organized in a hierarchy:
+  - `MasterView`: Core layout wrapper with navigation drawer
+  - `DashboardView`: Main dashboard content container
+  - `PatientSummaryCard`: Data aggregation and filtering UI
+  - `PatientDashboardTable`: Real-time patient data display
+
+### State Management
+
+- **React Query**: Used for server state management and data fetching
+  - Implements caching with configurable stale times
+  - Handles loading states efficiently
+- **React Hooks**: Used for local component state
+  - `useState` for UI state (filters, pagination, drawer open/close)
+  - `useCallback` and `useMemo` for performance optimization
+  - Custom hooks to encapsulate business logic:
+    - `useInitialPatients`: Data fetching and transformation
+    - `useEchoWebSocket`: Real-time data simulation with WebSockets
+
+### Component Design
+
+- **Single Responsibility Principle**: Each component has a focused purpose
+- **Separation of Logic**: Business logic isolated in hooks
+- **UI/UX Considerations**:
+  - Loading states (skeletons) for improved user experience
+  - Visual highlighting for real-time data changes
+  - Responsive design using MUI Grid system
+
+### Scalability and Maintainability
+
+- **Clean Code Structure**: Organized in directories by feature/module
+- **Type Safety**: TypeScript interfaces and types for all data structures
+- **Style Isolation**: Component-specific styles in separate files
+- **User-Facing Messages**: Externalized in dedicated message files for easier maintenance
+- **State Normalization**: Avoids state duplication for ease of updates
+
+## Choice of Tools and Libraries
+
+### Core Framework
+
+- **React**: Chosen for component-based architecture and efficient rendering
+- **TypeScript**: Provides static typing to catch errors early and improve maintainability
+
+### UI Framework
+
+- **Material UI**: Comprehensive component library that accelerates development
+  - Consistent theming and styling
+  - Built-in responsive design
+  - Accessibility features
+
+### State Management
+
+- **React Query**: Modern data-fetching library that simplifies server state
+  - Caching and invalidation control
+  - Loading/error state management
+  - Devtools for debugging
+
+### API Communication
+
+- **Axios**: Robust HTTP client for data fetching
+- **WebSocket**: For real-time data updates (simulated in the current implementation)
+
+### Build Tools
+
+- **Vite**: Fast, modern bundler for improved developer experience
+  - Quick hot module replacement
+  - Efficient production builds
+
+## Scaling Considerations
+
+### Data Management
+
+- **Pagination**: Currently implemented at the client-side for better UX
+- **Server-Side Pagination**: Would be implemented for larger datasets
+- **Data Virtualization**: For extremely large tables to minimize DOM elements
+
+### Performance Optimization
+
+- **Memoization**: Already using `useMemo` and `useCallback` for expensive operations
+- **Code Splitting**: Could implement lazy loading for larger application sections
+- **Service Worker**: For caching static assets and improved offline experience
+
+### Infrastructure
+
+- **Load Balancing**: Multiple server instances for handling increased user load
+- **CDN Integration**: For static asset delivery
+- **Database Optimization**: Implement proper indexing and query optimization
+
+### Real-time Updates
+
+- **WebSocket Connection Pooling**: Manage connection limits for large user bases
+- **Selective Updates**: Transmit only changed data to minimize bandwidth
+
+## Future Enhancements
+
+### Feature Additions
+
+- **Advanced Filtering**: More comprehensive filtering options beyond the current implementation
+- **Patient Details View**: Drill-down interface for detailed patient information
+- **Historical Data Visualization**: Charting of patient vital trends over time
+- **Alert System**: Configurable alerts for critical patient conditions
+- **User Authentication**: Role-based access control for different staff levels
+
+### Technical Improvements
+
+- **State Management Enhancement**: Consider Redux for more complex state requirements
+- **Backend Integration**: Replace mock data with real API endpoints
+- **Testing Framework**: Implement comprehensive unit and integration tests
+- **Accessibility Improvements**: Enhanced screen reader support and keyboard navigation
+- **Internationalization**: Support for multiple languages
+
+### Mobile Optimization
+
+- **Progressive Web App**: Full offline capabilities
+- **Responsive Enhancements**: Optimize specific views for mobile usage patterns
+- **Touch Gestures**: Implement swipe navigation for mobile users
+
+This design document reflects the current architecture of the ZA Dashboard UI and provides a roadmap for its continued evolution to meet growing requirements and user needs.
