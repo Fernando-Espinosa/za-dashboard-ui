@@ -16,6 +16,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { ArrowDropUp, ArrowDropDown, Clear } from '@mui/icons-material';
 import { PATIENT_DASHBOARD_MESSAGES as Messages } from './userFacingMessages';
@@ -23,8 +25,14 @@ import { PatientRow } from '../../hooks/useInitialPatients';
 import { useEchoWebSocket } from '../../hooks/useMockWebSocket';
 import {
   highlightStyle,
-  realTimeColumnStyle,
   tableStyle,
+  tableContainerStyle,
+  nameColumnStyle,
+  ageColumnStyle,
+  roomColumnStyle,
+  bloodPressureColumnStyle,
+  heartRateColumnStyle,
+  oxygenColumnStyle,
 } from './PatientDashboard.styles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -54,6 +62,8 @@ type AgeRangeCategory = 'all' | 'under18' | '18to30' | '30to50' | 'over50';
 
 export const PatientDashboardTable = ({ rows }: Props) => {
   const { TABLE } = Messages;
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(0);
   const [highlightMap, setHighlightMap] = useState<Record<string, string[]>>(
     {}
@@ -262,6 +272,16 @@ export const PatientDashboardTable = ({ rows }: Props) => {
     align: 'left' | 'right' = 'left',
     additionalStyle = {}
   ) => {
+    // Get responsive label based on screen size
+    const responsiveLabel = () => {
+      if (isSmallScreen) {
+        if (field === 'heartRate') return 'HR';
+        if (field === 'oxygenLevel') return 'O2';
+        if (field === 'bloodPressure') return 'BP';
+      }
+      return label;
+    };
+
     // Special case for blood pressure column
     if (field === 'bloodPressure') {
       return (
@@ -271,18 +291,31 @@ export const PatientDashboardTable = ({ rows }: Props) => {
               sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               onClick={() => handleSort(field)}
             >
-              {label}
+              {responsiveLabel()}
               {renderSortIcon(field)}
             </Box>
             <FormControl fullWidth size="small">
-              <InputLabel id="bp-filter-label">BP Filter</InputLabel>
+              {!isSmallScreen && (
+                <InputLabel id="bp-filter-label" sx={{ overflow: 'visible' }}>
+                  BP
+                </InputLabel>
+              )}
               <Select
                 labelId="bp-filter-label"
                 value={bpFilter}
-                label="BP Filter"
+                label={!isSmallScreen ? 'BP' : undefined}
                 onChange={(e) =>
                   handleBPFilterChange(e.target.value as BPCategory)
                 }
+                displayEmpty={isSmallScreen}
+                renderValue={isSmallScreen ? () => '' : undefined}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="low">Low</MenuItem>
@@ -304,18 +337,31 @@ export const PatientDashboardTable = ({ rows }: Props) => {
               sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               onClick={() => handleSort(field)}
             >
-              {label}
+              {responsiveLabel()}
               {renderSortIcon(field)}
             </Box>
             <FormControl fullWidth size="small">
-              <InputLabel id="o2-filter-label">O2 Filter</InputLabel>
+              {!isSmallScreen && (
+                <InputLabel id="o2-filter-label" sx={{ overflow: 'visible' }}>
+                  O2
+                </InputLabel>
+              )}
               <Select
                 labelId="o2-filter-label"
                 value={o2Filter}
-                label="O2 Filter"
+                label={!isSmallScreen ? 'O2' : undefined}
                 onChange={(e) =>
                   handleO2FilterChange(e.target.value as O2Category)
                 }
+                displayEmpty={isSmallScreen}
+                renderValue={isSmallScreen ? () => '' : undefined}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="low">Low</MenuItem>
@@ -337,23 +383,42 @@ export const PatientDashboardTable = ({ rows }: Props) => {
               sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               onClick={() => handleSort(field)}
             >
-              {label}
+              {responsiveLabel()}
               {renderSortIcon(field)}
             </Box>
             <FormControl fullWidth size="small">
-              <InputLabel id="hr-filter-label">HR Filter</InputLabel>
+              {!isSmallScreen && (
+                <InputLabel id="hr-filter-label" sx={{ overflow: 'visible' }}>
+                  HR
+                </InputLabel>
+              )}
               <Select
                 labelId="hr-filter-label"
                 value={hrFilter}
-                label="HR Filter"
+                label={!isSmallScreen ? 'HR' : undefined}
                 onChange={(e) =>
                   handleHRFilterChange(e.target.value as HRCategory)
                 }
+                displayEmpty={isSmallScreen}
+                renderValue={isSmallScreen ? () => '' : undefined}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 <MenuItem value="all">All</MenuItem>
-                <MenuItem value="low">Low (&lt;60)</MenuItem>
-                <MenuItem value="normal">Normal (60-100)</MenuItem>
-                <MenuItem value="high">High (&gt;100)</MenuItem>
+                <MenuItem value="low" sx={{ whiteSpace: 'nowrap' }}>
+                  Low (&lt;60)
+                </MenuItem>
+                <MenuItem value="normal" sx={{ whiteSpace: 'nowrap' }}>
+                  Normal (60-100)
+                </MenuItem>
+                <MenuItem value="high" sx={{ whiteSpace: 'nowrap' }}>
+                  High (&gt;100)
+                </MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -370,24 +435,45 @@ export const PatientDashboardTable = ({ rows }: Props) => {
               sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               onClick={() => handleSort(field)}
             >
-              {label}
+              {responsiveLabel()}
               {renderSortIcon(field)}
             </Box>
             <FormControl fullWidth size="small">
-              <InputLabel id="age-filter-label">Age Range</InputLabel>
+              {!isSmallScreen && (
+                <InputLabel id="age-filter-label" sx={{ overflow: 'visible' }}>
+                  Age
+                </InputLabel>
+              )}
               <Select
                 labelId="age-filter-label"
                 value={ageFilter}
-                label="Age Range"
+                label={!isSmallScreen ? 'Age' : undefined}
                 onChange={(e) =>
                   handleAgeFilterChange(e.target.value as AgeRangeCategory)
                 }
+                displayEmpty={isSmallScreen}
+                renderValue={isSmallScreen ? () => '' : undefined}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 <MenuItem value="all">All Ages</MenuItem>
-                <MenuItem value="under18">&lt;18</MenuItem>
-                <MenuItem value="18to30">18-30</MenuItem>
-                <MenuItem value="30to50">30-50</MenuItem>
-                <MenuItem value="over50">&gt;50</MenuItem>
+                <MenuItem value="under18" sx={{ whiteSpace: 'nowrap' }}>
+                  &lt;18
+                </MenuItem>
+                <MenuItem value="18to30" sx={{ whiteSpace: 'nowrap' }}>
+                  18-30
+                </MenuItem>
+                <MenuItem value="30to50" sx={{ whiteSpace: 'nowrap' }}>
+                  30-50
+                </MenuItem>
+                <MenuItem value="over50" sx={{ whiteSpace: 'nowrap' }}>
+                  &gt;50
+                </MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -403,7 +489,7 @@ export const PatientDashboardTable = ({ rows }: Props) => {
             sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
             onClick={() => handleSort(field)}
           >
-            {label}
+            {responsiveLabel()}
             {renderSortIcon(field)}
           </Box>
           <TextField
@@ -432,30 +518,45 @@ export const PatientDashboardTable = ({ rows }: Props) => {
   };
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={tableContainerStyle}>
       <Table sx={tableStyle} aria-label={TABLE.ARIA_LABEL}>
         <TableHead>
           <TableRow>
-            {renderColumnHeader('name', TABLE.HEADERS.NAME)}
-            {renderColumnHeader('age', TABLE.HEADERS.AGE, 'right')}
-            {renderColumnHeader('room', TABLE.HEADERS.ROOM, 'right')}
+            {renderColumnHeader(
+              'name',
+              TABLE.HEADERS.NAME,
+              'left',
+              nameColumnStyle
+            )}
+            {renderColumnHeader(
+              'age',
+              TABLE.HEADERS.AGE,
+              'right',
+              ageColumnStyle
+            )}
+            {renderColumnHeader(
+              'room',
+              TABLE.HEADERS.ROOM,
+              'right',
+              roomColumnStyle
+            )}
             {renderColumnHeader(
               'bloodPressure',
               TABLE.HEADERS.BLOOD_PRESSURE,
               'right',
-              realTimeColumnStyle
+              bloodPressureColumnStyle
             )}
             {renderColumnHeader(
               'heartRate',
               TABLE.HEADERS.HEART_RATE,
               'right',
-              realTimeColumnStyle
+              heartRateColumnStyle
             )}
             {renderColumnHeader(
               'oxygenLevel',
               TABLE.HEADERS.OXYGEN_LEVEL,
               'right',
-              realTimeColumnStyle
+              oxygenColumnStyle
             )}
           </TableRow>
         </TableHead>
@@ -463,15 +564,19 @@ export const PatientDashboardTable = ({ rows }: Props) => {
           <TableBody>
             {currentPageRows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell align="right">{row.age}</TableCell>
-                <TableCell align="right">{row.room}</TableCell>
+                <TableCell sx={nameColumnStyle}>{row.name}</TableCell>
+                <TableCell align="right" sx={ageColumnStyle}>
+                  {row.age}
+                </TableCell>
+                <TableCell align="right" sx={roomColumnStyle}>
+                  {row.room}
+                </TableCell>
                 <TableCell
                   align="right"
                   sx={
                     isHighlighted(row.name, 'bloodPressure')
-                      ? highlightStyle
-                      : realTimeColumnStyle
+                      ? { ...bloodPressureColumnStyle, ...highlightStyle }
+                      : bloodPressureColumnStyle
                   }
                 >
                   {row.bloodPressure}
@@ -480,8 +585,8 @@ export const PatientDashboardTable = ({ rows }: Props) => {
                   align="right"
                   sx={
                     isHighlighted(row.name, 'heartRate')
-                      ? highlightStyle
-                      : realTimeColumnStyle
+                      ? { ...heartRateColumnStyle, ...highlightStyle }
+                      : heartRateColumnStyle
                   }
                 >
                   {row.heartRate}
@@ -490,8 +595,8 @@ export const PatientDashboardTable = ({ rows }: Props) => {
                   align="right"
                   sx={
                     isHighlighted(row.name, 'oxygenLevel')
-                      ? highlightStyle
-                      : realTimeColumnStyle
+                      ? { ...oxygenColumnStyle, ...highlightStyle }
+                      : oxygenColumnStyle
                   }
                 >
                   {row.oxygenLevel}

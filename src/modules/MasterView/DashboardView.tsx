@@ -1,4 +1,4 @@
-import { Skeleton, Box, Paper } from '@mui/material';
+import { Skeleton, Box, Paper, Container } from '@mui/material';
 import { useInitialPatients, PatientRow } from '../../hooks/useInitialPatients';
 import { PatientDashboardTable } from '../PatientDashboardTable';
 import { PatientSummaryCard } from '../PatientsSummary';
@@ -6,6 +6,7 @@ import {
   skeletonContainerStyles,
   skeletonBoxStyles,
   skeletonRowStyles,
+  dashboardContainerStyles,
 } from './DashboardView.styles';
 import { useAppSelector } from '../../store/hooks';
 import { selectCardFilter } from '../../store/filtersSlice';
@@ -47,45 +48,50 @@ export const DashboardView = () => {
 
   if (isLoading || !data) {
     return (
-      <Box>
-        {/* Skeleton for the summary cards */}
-        <Paper sx={skeletonContainerStyles} data-testid="skeleton-container">
-          <Box sx={skeletonBoxStyles}>
-            {[1, 2, 3].map((item) => (
+      <Container maxWidth="xl">
+        <Box sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+          {/* Skeleton for the summary cards */}
+          <Paper sx={skeletonContainerStyles} data-testid="skeleton-container">
+            <Box sx={skeletonBoxStyles}>
+              {[1, 2, 3].map((item) => (
+                <Skeleton
+                  key={item}
+                  variant="rectangular"
+                  width="100%"
+                  height={120}
+                  animation="wave"
+                  sx={{ flexBasis: { xs: '100%', sm: '50%', md: '33%' } }}
+                />
+              ))}
+            </Box>
+          </Paper>
+
+          {/* Skeleton for table header */}
+          <Paper>
+            <Skeleton variant="rectangular" height={56} animation="wave" />
+
+            {/* Skeleton for 10 table rows */}
+            {Array.from({ length: 10 }).map((_, index) => (
               <Skeleton
-                key={item}
+                key={index}
                 variant="rectangular"
-                width="33%"
-                height={120}
+                height={52}
                 animation="wave"
+                sx={skeletonRowStyles}
               />
             ))}
-          </Box>
-        </Paper>
-
-        {/* Skeleton for table header */}
-        <Paper>
-          <Skeleton variant="rectangular" height={56} animation="wave" />
-
-          {/* Skeleton for 10 table rows */}
-          {Array.from({ length: 10 }).map((_, index) => (
-            <Skeleton
-              key={index}
-              variant="rectangular"
-              height={52}
-              animation="wave"
-              sx={skeletonRowStyles}
-            />
-          ))}
-        </Paper>
-      </Box>
+          </Paper>
+        </Box>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <PatientSummaryCard rows={data} />
-      <PatientDashboardTable rows={filteredRows} />
-    </div>
+    <Container maxWidth="xl" sx={dashboardContainerStyles}>
+      <Box sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+        <PatientSummaryCard rows={data} />
+        <PatientDashboardTable rows={filteredRows} />
+      </Box>
+    </Container>
   );
 };

@@ -22,8 +22,7 @@ import {
   Main,
   DrawerHeader,
   iconButtonStyles,
-  iconButtonHiddenStyles,
-  drawerStyles,
+  drawerWidth,
   boxStyles,
 } from './MasterView.styles';
 
@@ -42,23 +41,37 @@ export const MasterView = () => {
   return (
     <Box sx={boxStyles}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={[iconButtonStyles, open && iconButtonHiddenStyles]}
+            sx={iconButtonStyles}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Patient Dashbaord
+            Patient Dashboard
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer sx={drawerStyles} variant="persistent" anchor="left" open={open}>
+      <Drawer
+        anchor="left"
+        open={open}
+        onClose={handleDrawerClose}
+        variant="temporary"
+        PaperProps={{
+          sx: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        ModalProps={{
+          keepMounted: true, // Better performance on mobile
+        }}
+      >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
@@ -80,7 +93,7 @@ export const MasterView = () => {
           </ListItem>
         </List>
       </Drawer>
-      <Main open={open}>
+      <Main>
         <DrawerHeader />
         <DashboardView />
       </Main>
