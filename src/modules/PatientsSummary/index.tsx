@@ -10,18 +10,21 @@ import {
   getFilterIconStyles,
   filterChipStyles,
 } from './PatientSummary.styles';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  selectCardFilter,
+  setCardFilter,
+  CardFilterKey,
+} from '../../store/filtersSlice';
 
 type Props = {
   rows: PatientRow[];
-  activeFilter: string | null;
-  onToggleFilter: (filterKey: string) => void;
 };
 
-export const PatientSummaryCard = ({
-  rows,
-  activeFilter,
-  onToggleFilter,
-}: Props) => {
+export const PatientSummaryCard = ({ rows }: Props) => {
+  const dispatch = useAppDispatch();
+  const activeFilter = useAppSelector(selectCardFilter);
+
   const summary = useMemo(() => {
     const total = rows.length;
     const males = rows.filter((p) => p.gender === 'Male').length;
@@ -48,7 +51,18 @@ export const PatientSummaryCard = ({
     };
   }, [rows]);
 
+  // Only highBP and lowO2 are filterable now
   const isFilterable = (key: string) => key === 'highBP' || key === 'lowO2';
+
+  const handleToggleFilter = (filterKey: string) => {
+    if (isFilterable(filterKey)) {
+      dispatch(
+        setCardFilter(
+          activeFilter === filterKey ? null : (filterKey as CardFilterKey)
+        )
+      );
+    }
+  };
 
   return (
     <Box sx={summaryBoxStyles}>
@@ -58,11 +72,11 @@ export const PatientSummaryCard = ({
           const isFilter = isFilterable(key);
 
           return (
-            <Grid item xs={6} md={2} key={key}>
+            <Grid key={key} sx={{ gridColumn: { xs: 'span 6', md: 'span 2' } }}>
               <Card
                 sx={getCardStyles(isFilter, isActive)}
                 onClick={() => {
-                  if (isFilter) onToggleFilter(key);
+                  if (isFilter) handleToggleFilter(key);
                 }}
               >
                 <CardContent>

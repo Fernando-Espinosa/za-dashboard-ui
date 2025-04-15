@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Skeleton, Box, Paper } from '@mui/material';
 import { useInitialPatients, PatientRow } from '../../hooks/useInitialPatients';
 import { PatientDashboardTable } from '../PatientDashboardTable';
@@ -9,34 +7,49 @@ import {
   skeletonBoxStyles,
   skeletonRowStyles,
 } from './DashboardView.styles';
+import { useAppSelector } from '../../store/hooks';
+import { selectCardFilter } from '../../store/filtersSlice';
 
 export const DashboardView = () => {
   const { data, isLoading } = useInitialPatients();
-  const [filter, setFilter] = useState<string | null>(null);
+  const cardFilter = useAppSelector(selectCardFilter);
 
   const filteredRows: PatientRow[] =
-    filter && data
+    cardFilter && data
       ? data.filter((row) => {
-          if (filter === 'highBP') {
+          if (cardFilter === 'highBP') {
             const [sys, dia] = row.bloodPressure.split('/').map(Number);
             return sys > 140 || dia > 90;
           }
-          if (filter === 'lowO2') {
+          // Oxygen level filters
+          if (cardFilter === 'lowO2') {
             return row.oxygenLevel < 92;
+          }
+          if (cardFilter === 'normalO2') {
+            return row.oxygenLevel >= 92 && row.oxygenLevel <= 98;
+          }
+          if (cardFilter === 'highO2') {
+            return row.oxygenLevel > 98;
+          }
+          // Heart rate filters
+          if (cardFilter === 'lowHR') {
+            return row.heartRate < 60;
+          }
+          if (cardFilter === 'normalHR') {
+            return row.heartRate >= 60 && row.heartRate <= 100;
+          }
+          if (cardFilter === 'highHR') {
+            return row.heartRate > 100;
           }
           return true;
         })
       : data || [];
 
-  const handleFilterToggle = (filterKey: string) => {
-    setFilter((prev) => (prev === filterKey ? null : filterKey));
-  };
-
   if (isLoading || !data) {
     return (
       <Box>
         {/* Skeleton for the summary cards */}
-        <Paper sx={skeletonContainerStyles}>
+        <Paper sx={skeletonContainerStyles} data-testid="skeleton-container">
           <Box sx={skeletonBoxStyles}>
             {[1, 2, 3].map((item) => (
               <Skeleton
@@ -71,11 +84,7 @@ export const DashboardView = () => {
 
   return (
     <div>
-      <PatientSummaryCard
-        rows={data}
-        activeFilter={filter}
-        onToggleFilter={handleFilterToggle}
-      />
+      <PatientSummaryCard rows={data} />
       <PatientDashboardTable rows={filteredRows} />
     </div>
   );
