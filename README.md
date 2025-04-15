@@ -1,5 +1,18 @@
 # ZA Dashboard UI - Design Documentation
 
+## Quick Start Commands
+
+```bash
+# Run development server
+yarn dev
+
+# Run tests
+yarn test
+
+# Build for production
+yarn build
+```
+
 ## Design Process
 
 ### Architecture
