@@ -41,7 +41,9 @@ export const PatientSummaryCard = ({ rows }: Props) => {
             <Card>
               <CardContent>
                 <Typography variant="subtitle2" gutterBottom>
-                  {key.replace(/([A-Z])/g, ' $1')}
+                  {key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^\w/, (c) => c.toUpperCase())}
                 </Typography>
                 <Typography variant="h5">{value}</Typography>
               </CardContent>
