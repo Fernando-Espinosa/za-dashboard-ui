@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import { PatientDashboard } from '../PatientDashboard';
+import { DashboardView } from './DashboardView';
 
 const drawerWidth = 240;
 
@@ -152,7 +152,7 @@ export const MasterView = () => {
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
-        <PatientDashboard />
+        <DashboardView />
       </Main>
     </Box>
   );
