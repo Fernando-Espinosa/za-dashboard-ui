@@ -3,6 +3,13 @@ import { useMemo } from 'react';
 import { Box, Card, CardContent, Typography, Grid, Chip } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { PatientRow } from '../../hooks/useInitialPatients';
+import {
+  summaryBoxStyles,
+  getCardStyles,
+  typographyContainerStyles,
+  getFilterIconStyles,
+  filterChipStyles,
+} from './PatientSummary.styles';
 
 type Props = {
   rows: PatientRow[];
@@ -44,7 +51,7 @@ export const PatientSummaryCard = ({
   const isFilterable = (key: string) => key === 'highBP' || key === 'lowO2';
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={summaryBoxStyles}>
       <Grid container spacing={2}>
         {Object.entries(summary).map(([key, value]) => {
           const isActive = key === activeFilter;
@@ -53,19 +60,7 @@ export const PatientSummaryCard = ({
           return (
             <Grid item xs={6} md={2} key={key}>
               <Card
-                sx={{
-                  cursor: isFilter ? 'pointer' : 'default',
-                  border: isActive ? '2px solid #1976d2' : '1px solid #ccc',
-                  backgroundColor: isActive ? '#e3f2fd' : 'white',
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                  ...(isFilter && {
-                    borderLeft: '4px solid #f50057',
-                    '&:hover': {
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                    },
-                  }),
-                }}
+                sx={getCardStyles(isFilter, isActive)}
                 onClick={() => {
                   if (isFilter) onToggleFilter(key);
                 }}
@@ -74,19 +69,12 @@ export const PatientSummaryCard = ({
                   <Typography
                     variant="subtitle2"
                     gutterBottom
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
+                    sx={typographyContainerStyles}
                   >
                     {isFilter && (
                       <FilterAltIcon
                         fontSize="small"
-                        sx={{
-                          color: isActive ? '#1976d2' : '#757575',
-                          verticalAlign: 'middle',
-                        }}
+                        sx={getFilterIconStyles(isActive)}
                       />
                     )}
                     {key
@@ -96,11 +84,7 @@ export const PatientSummaryCard = ({
                       <Chip
                         size="small"
                         label="Filter"
-                        sx={{
-                          height: '16px',
-                          fontSize: '10px',
-                          ml: 'auto',
-                        }}
+                        sx={filterChipStyles}
                         color={isActive ? 'primary' : 'default'}
                       />
                     )}
