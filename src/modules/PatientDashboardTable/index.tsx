@@ -26,6 +26,17 @@ import {
   realTimeColumnStyle,
   tableStyle,
 } from './PatientDashboard.styles';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  selectBPFilter,
+  selectO2Filter,
+  selectHRFilter,
+  selectAgeFilter,
+  setBPFilter,
+  setO2Filter,
+  setHRFilter,
+  setAgeFilter,
+} from '../../store/filtersSlice';
 
 const PAGE_SIZE = 10;
 
@@ -37,6 +48,9 @@ type SortDirection = 'asc' | 'desc';
 type SortField = keyof PatientRow | null;
 type Filters = Partial<Record<keyof PatientRow, string>>;
 type BPCategory = 'all' | 'low' | 'normal' | 'high';
+type O2Category = 'all' | 'low' | 'normal' | 'high';
+type HRCategory = 'all' | 'low' | 'normal' | 'high';
+type AgeRangeCategory = 'all' | 'under18' | '18to30' | '30to50' | 'over50';
 
 export const PatientDashboardTable = ({ rows }: Props) => {
   const { TABLE } = Messages;
@@ -47,12 +61,17 @@ export const PatientDashboardTable = ({ rows }: Props) => {
   const [sortField, setSortField] = useState<SortField>('age');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [filters, setFilters] = useState<Filters>({});
-  const [bpFilter, setBpFilter] = useState<BPCategory>('all');
+
+  const dispatch = useAppDispatch();
+  const bpFilter = useAppSelector(selectBPFilter);
+  const o2Filter = useAppSelector(selectO2Filter);
+  const hrFilter = useAppSelector(selectHRFilter);
+  const ageFilter = useAppSelector(selectAgeFilter);
 
   // Reset page when filter changes
   useEffect(() => {
     setPage(0);
-  }, [rows, filters, bpFilter]);
+  }, [rows, filters, bpFilter, o2Filter, hrFilter, ageFilter]);
 
   const handleSort = (field: keyof PatientRow) => {
     if (sortField === field) {
@@ -87,6 +106,28 @@ export const PatientDashboardTable = ({ rows }: Props) => {
     return 'normal';
   };
 
+  // Function to categorize oxygen level
+  const getO2Category = (o2Level: number): O2Category => {
+    if (o2Level < 92) return 'low';
+    if (o2Level > 98) return 'high';
+    return 'normal';
+  };
+
+  // Function to categorize heart rate
+  const getHRCategory = (heartRate: number): HRCategory => {
+    if (heartRate < 60) return 'low';
+    if (heartRate > 100) return 'high';
+    return 'normal';
+  };
+
+  // Function to categorize age
+  const getAgeCategory = (age: number): AgeRangeCategory => {
+    if (age < 18) return 'under18';
+    if (age >= 18 && age <= 30) return '18to30';
+    if (age > 30 && age <= 50) return '30to50';
+    return 'over50';
+  };
+
   // Apply filters to rows
   const filteredRows = rows.filter((row) => {
     // Apply blood pressure category filter
@@ -94,10 +135,28 @@ export const PatientDashboardTable = ({ rows }: Props) => {
       return false;
     }
 
+    // Apply oxygen level category filter
+    if (o2Filter !== 'all' && getO2Category(row.oxygenLevel) !== o2Filter) {
+      return false;
+    }
+
+    // Apply heart rate category filter
+    if (hrFilter !== 'all' && getHRCategory(row.heartRate) !== hrFilter) {
+      return false;
+    }
+
+    // Apply age range filter
+    if (ageFilter !== 'all' && getAgeCategory(row.age) !== ageFilter) {
+      return false;
+    }
+
     // Apply other text filters
     return Object.entries(filters).every(([field, value]) => {
       if (!value) return true;
       if (field === 'bloodPressure') return true; // Skip text filtering for BP, using category filter instead
+      if (field === 'oxygenLevel') return true; // Skip text filtering for O2, using category filter instead
+      if (field === 'heartRate') return true; // Skip text filtering for HR, using category filter instead
+      if (field === 'age') return true; // Skip text filtering for age, using category filter instead
 
       const fieldValue = String(row[field as keyof PatientRow]).toLowerCase();
       return fieldValue.includes(value.toLowerCase());
@@ -182,7 +241,19 @@ export const PatientDashboardTable = ({ rows }: Props) => {
   };
 
   const handleBPFilterChange = (category: BPCategory) => {
-    setBpFilter(category);
+    dispatch(setBPFilter(category));
+  };
+
+  const handleO2FilterChange = (category: O2Category) => {
+    dispatch(setO2Filter(category));
+  };
+
+  const handleHRFilterChange = (category: HRCategory) => {
+    dispatch(setHRFilter(category));
+  };
+
+  const handleAgeFilterChange = (category: AgeRangeCategory) => {
+    dispatch(setAgeFilter(category));
   };
 
   const renderColumnHeader = (
@@ -217,6 +288,106 @@ export const PatientDashboardTable = ({ rows }: Props) => {
                 <MenuItem value="low">Low</MenuItem>
                 <MenuItem value="normal">Normal</MenuItem>
                 <MenuItem value="high">High</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </TableCell>
+      );
+    }
+
+    // Special case for oxygen level column
+    if (field === 'oxygenLevel') {
+      return (
+        <TableCell align={align} sx={additionalStyle}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => handleSort(field)}
+            >
+              {label}
+              {renderSortIcon(field)}
+            </Box>
+            <FormControl fullWidth size="small">
+              <InputLabel id="o2-filter-label">O2 Filter</InputLabel>
+              <Select
+                labelId="o2-filter-label"
+                value={o2Filter}
+                label="O2 Filter"
+                onChange={(e) =>
+                  handleO2FilterChange(e.target.value as O2Category)
+                }
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="normal">Normal</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </TableCell>
+      );
+    }
+
+    // Special case for heart rate column
+    if (field === 'heartRate') {
+      return (
+        <TableCell align={align} sx={additionalStyle}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => handleSort(field)}
+            >
+              {label}
+              {renderSortIcon(field)}
+            </Box>
+            <FormControl fullWidth size="small">
+              <InputLabel id="hr-filter-label">HR Filter</InputLabel>
+              <Select
+                labelId="hr-filter-label"
+                value={hrFilter}
+                label="HR Filter"
+                onChange={(e) =>
+                  handleHRFilterChange(e.target.value as HRCategory)
+                }
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="low">Low (&lt;60)</MenuItem>
+                <MenuItem value="normal">Normal (60-100)</MenuItem>
+                <MenuItem value="high">High (&gt;100)</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </TableCell>
+      );
+    }
+
+    // Special case for age column
+    if (field === 'age') {
+      return (
+        <TableCell align={align} sx={additionalStyle}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => handleSort(field)}
+            >
+              {label}
+              {renderSortIcon(field)}
+            </Box>
+            <FormControl fullWidth size="small">
+              <InputLabel id="age-filter-label">Age Range</InputLabel>
+              <Select
+                labelId="age-filter-label"
+                value={ageFilter}
+                label="Age Range"
+                onChange={(e) =>
+                  handleAgeFilterChange(e.target.value as AgeRangeCategory)
+                }
+              >
+                <MenuItem value="all">All Ages</MenuItem>
+                <MenuItem value="under18">&lt;18</MenuItem>
+                <MenuItem value="18to30">18-30</MenuItem>
+                <MenuItem value="30to50">30-50</MenuItem>
+                <MenuItem value="over50">&gt;50</MenuItem>
               </Select>
             </FormControl>
           </Box>
