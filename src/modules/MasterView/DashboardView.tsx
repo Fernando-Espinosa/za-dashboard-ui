@@ -4,6 +4,11 @@ import { Skeleton, Box, Paper } from '@mui/material';
 import { useInitialPatients, PatientRow } from '../../hooks/useInitialPatients';
 import { PatientDashboardTable } from '../PatientDashboardTable';
 import { PatientSummaryCard } from '../PatientsSummary';
+import {
+  skeletonContainerStyles,
+  skeletonBoxStyles,
+  skeletonRowStyles,
+} from './DashboardView.styles';
 
 export const DashboardView = () => {
   const { data, isLoading } = useInitialPatients();
@@ -31,8 +36,8 @@ export const DashboardView = () => {
     return (
       <Box>
         {/* Skeleton for the summary cards */}
-        <Paper sx={{ mb: 2, p: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+        <Paper sx={skeletonContainerStyles}>
+          <Box sx={skeletonBoxStyles}>
             {[1, 2, 3].map((item) => (
               <Skeleton
                 key={item}
@@ -56,7 +61,7 @@ export const DashboardView = () => {
               variant="rectangular"
               height={52}
               animation="wave"
-              sx={{ mt: 0.5 }}
+              sx={skeletonRowStyles}
             />
           ))}
         </Paper>

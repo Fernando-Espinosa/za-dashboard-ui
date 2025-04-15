@@ -6,3 +6,7 @@ export const highlightStyle = {
 export const realTimeColumnStyle = {
   backgroundColor: '#f1f8ff', // very light blue
 };
+
+export const tableStyle = {
+  minWidth: 650,
+};
