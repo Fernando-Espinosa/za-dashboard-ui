@@ -459,45 +459,55 @@ export const PatientDashboardTable = ({ rows }: Props) => {
             )}
           </TableRow>
         </TableHead>
-        <TableBody>
-          {currentPageRows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell align="right">{row.age}</TableCell>
-              <TableCell align="right">{row.room}</TableCell>
-              <TableCell
-                align="right"
-                sx={
-                  isHighlighted(row.name, 'bloodPressure')
-                    ? highlightStyle
-                    : realTimeColumnStyle
-                }
-              >
-                {row.bloodPressure}
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={
-                  isHighlighted(row.name, 'heartRate')
-                    ? highlightStyle
-                    : realTimeColumnStyle
-                }
-              >
-                {row.heartRate}
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={
-                  isHighlighted(row.name, 'oxygenLevel')
-                    ? highlightStyle
-                    : realTimeColumnStyle
-                }
-              >
-                {row.oxygenLevel}
+        {filteredRows.length > 0 ? (
+          <TableBody>
+            {currentPageRows.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.name}</TableCell>
+                <TableCell align="right">{row.age}</TableCell>
+                <TableCell align="right">{row.room}</TableCell>
+                <TableCell
+                  align="right"
+                  sx={
+                    isHighlighted(row.name, 'bloodPressure')
+                      ? highlightStyle
+                      : realTimeColumnStyle
+                  }
+                >
+                  {row.bloodPressure}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={
+                    isHighlighted(row.name, 'heartRate')
+                      ? highlightStyle
+                      : realTimeColumnStyle
+                  }
+                >
+                  {row.heartRate}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={
+                    isHighlighted(row.name, 'oxygenLevel')
+                      ? highlightStyle
+                      : realTimeColumnStyle
+                  }
+                >
+                  {row.oxygenLevel}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        ) : (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                No results found. Please adjust your filters.
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
+          </TableBody>
+        )}
       </Table>
 
       <TablePagination
