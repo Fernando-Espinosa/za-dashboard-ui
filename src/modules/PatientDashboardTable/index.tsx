@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -11,69 +11,64 @@ import {
   TablePagination,
 } from '@mui/material';
 import { PATIENT_DASHBOARD_MESSAGES as Messages } from './userFacingMessages';
-import { useInitialPatients, PatientRow } from '../../hooks/useInitialPatients';
+import { PatientRow } from '../../hooks/useInitialPatients';
 import { useEchoWebSocket } from '../../hooks/useMockWebSocket';
 
 const PAGE_SIZE = 10;
 
-export const PatientDashboardTable = () => {
+type Props = {
+  rows: PatientRow[];
+  loading?: boolean;
+};
+
+export const PatientDashboardTable = ({ rows, loading = false }: Props) => {
   const { TABLE } = Messages;
-  const { data: allRows, isLoading } = useInitialPatients();
-  const [rows, setRows] = useState<PatientRow[]>([]);
+  const [page, setPage] = useState(0);
   const [highlightMap, setHighlightMap] = useState<Record<string, string[]>>(
     {}
   );
-  const [page, setPage] = useState(0);
 
+  // Reset page when filter changes
   useEffect(() => {
-    if (allRows) setRows(allRows);
-  }, [allRows]);
-
-  const updateVitals = useCallback(
-    (vitals: Partial<PatientRow> & { name: string }) => {
-      setRows((prevRows) =>
-        prevRows.map((row) => {
-          if (row.name !== vitals.name) return row;
-
-          const changedFields: string[] = [];
-          if (
-            vitals.bloodPressure &&
-            row.bloodPressure !== vitals.bloodPressure
-          )
-            changedFields.push('bloodPressure');
-          if (vitals.heartRate && row.heartRate !== vitals.heartRate)
-            changedFields.push('heartRate');
-          if (vitals.oxygenLevel && row.oxygenLevel !== vitals.oxygenLevel)
-            changedFields.push('oxygenLevel');
-
-          if (changedFields.length > 0) {
-            setHighlightMap((prev) => ({
-              ...prev,
-              [row.name]: changedFields,
-            }));
-            setTimeout(() => {
-              setHighlightMap((prev) => ({
-                ...prev,
-                [row.name]: [],
-              }));
-            }, 1000);
-          }
-
-          return {
-            ...row,
-            ...vitals,
-          };
-        })
-      );
-    },
-    []
-  );
+    setPage(0);
+  }, [rows]);
 
   const currentPageRows = rows.slice(
     page * PAGE_SIZE,
     page * PAGE_SIZE + PAGE_SIZE
   );
-  const patientNames = currentPageRows.map((r) => r.name); // optimize for visible only
+
+  const updateVitals = useCallback(
+    (vitals: Partial<PatientRow> & { name: string }) => {
+      rows.forEach((row) => {
+        if (row.name !== vitals.name) return;
+
+        const changedFields: string[] = [];
+        if (vitals.bloodPressure && row.bloodPressure !== vitals.bloodPressure)
+          changedFields.push('bloodPressure');
+        if (vitals.heartRate && row.heartRate !== vitals.heartRate)
+          changedFields.push('heartRate');
+        if (vitals.oxygenLevel && row.oxygenLevel !== vitals.oxygenLevel)
+          changedFields.push('oxygenLevel');
+
+        if (changedFields.length > 0) {
+          setHighlightMap((prev) => ({
+            ...prev,
+            [row.name]: changedFields,
+          }));
+          setTimeout(() => {
+            setHighlightMap((prev) => ({
+              ...prev,
+              [row.name]: [],
+            }));
+          }, 1000);
+        }
+      });
+    },
+    [rows]
+  );
+
+  const patientNames = currentPageRows.map((r) => r.name);
   useEchoWebSocket(patientNames, updateVitals);
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -92,7 +87,7 @@ export const PatientDashboardTable = () => {
     backgroundColor: '#f1f8ff',
   };
 
-  if (isLoading) return <CircularProgress />;
+  if (loading) return <CircularProgress />;
 
   return (
     <TableContainer component={Paper}>
