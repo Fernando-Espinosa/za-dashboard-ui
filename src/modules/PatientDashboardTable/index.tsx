@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
   TablePagination,
 } from '@mui/material';
 import { PATIENT_DASHBOARD_MESSAGES as Messages } from './userFacingMessages';
@@ -18,10 +17,9 @@ const PAGE_SIZE = 10;
 
 type Props = {
   rows: PatientRow[];
-  loading?: boolean;
 };
 
-export const PatientDashboardTable = ({ rows, loading = false }: Props) => {
+export const PatientDashboardTable = ({ rows }: Props) => {
   const { TABLE } = Messages;
   const [page, setPage] = useState(0);
   const [highlightMap, setHighlightMap] = useState<Record<string, string[]>>(
@@ -86,8 +84,6 @@ export const PatientDashboardTable = ({ rows, loading = false }: Props) => {
   const realTimeColumnStyle = {
     backgroundColor: '#f1f8ff',
   };
-
-  if (loading) return <CircularProgress />;
 
   return (
     <TableContainer component={Paper}>
