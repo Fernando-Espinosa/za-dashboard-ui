@@ -14,8 +14,8 @@ export type PatientRow = {
 };
 
 const randomVitals = () => ({
-  bloodPressure: `${Math.floor(Math.random() * 40 + 90)}/${Math.floor(
-    Math.random() * 20 + 60
+  bloodPressure: `${Math.floor(Math.random() * 70 + 90)}/${Math.floor(
+    Math.random() * 40 + 60
   )}`,
   heartRate: Math.floor(Math.random() * (130 - 60) + 60),
   oxygenLevel: Math.floor(Math.random() * (100 - 85) + 85),
