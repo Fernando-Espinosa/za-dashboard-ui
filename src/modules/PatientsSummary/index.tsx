@@ -1,7 +1,8 @@
 // PatientSummaryCard.tsx
 import { useMemo } from 'react';
-import { PatientRow } from '@/hooks/useInitialPatients';
-import { Box, Card, CardContent, Typography, Grid } from '@mui/material';
+import { Box, Card, CardContent, Typography, Grid, Chip } from '@mui/material';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { PatientRow } from '../../hooks/useInitialPatients';
 
 type Props = {
   rows: PatientRow[];
@@ -47,24 +48,62 @@ export const PatientSummaryCard = ({
       <Grid container spacing={2}>
         {Object.entries(summary).map(([key, value]) => {
           const isActive = key === activeFilter;
+          const isFilter = isFilterable(key);
+
           return (
             <Grid item xs={6} md={2} key={key}>
               <Card
                 sx={{
-                  cursor: isFilterable(key) ? 'pointer' : 'default',
+                  cursor: isFilter ? 'pointer' : 'default',
                   border: isActive ? '2px solid #1976d2' : '1px solid #ccc',
                   backgroundColor: isActive ? '#e3f2fd' : 'white',
                   transition: 'all 0.2s ease',
+                  position: 'relative',
+                  ...(isFilter && {
+                    borderLeft: '4px solid #f50057',
+                    '&:hover': {
+                      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    },
+                  }),
                 }}
                 onClick={() => {
-                  if (isFilterable(key)) onToggleFilter(key);
+                  if (isFilter) onToggleFilter(key);
                 }}
               >
                 <CardContent>
-                  <Typography variant="subtitle2" gutterBottom>
+                  <Typography
+                    variant="subtitle2"
+                    gutterBottom
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    {isFilter && (
+                      <FilterAltIcon
+                        fontSize="small"
+                        sx={{
+                          color: isActive ? '#1976d2' : '#757575',
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                    )}
                     {key
                       .replace(/([A-Z])/g, ' $1')
                       .replace(/^./, (s) => s.toUpperCase())}
+                    {isFilter && (
+                      <Chip
+                        size="small"
+                        label="Filter"
+                        sx={{
+                          height: '16px',
+                          fontSize: '10px',
+                          ml: 'auto',
+                        }}
+                        color={isActive ? 'primary' : 'default'}
+                      />
+                    )}
                   </Typography>
                   <Typography variant="h5">{value}</Typography>
                 </CardContent>
