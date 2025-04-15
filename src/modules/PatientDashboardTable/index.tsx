@@ -225,7 +225,7 @@ export const PatientDashboardTable = ({ rows }: Props) => {
     [rows]
   );
 
-  const patientNames = currentPageRows.map((r) => r.name);
+  const patientNames = rows.map((r) => r.name);
   useEchoWebSocket(patientNames, updateVitals);
 
   const handleChangePage = (_: unknown, newPage: number) => {
