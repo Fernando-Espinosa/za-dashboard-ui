@@ -10,6 +10,7 @@ export type PatientRow = {
   bloodPressure: string;
   heartRate: number;
   oxygenLevel: number;
+  gender: 'Male' | 'Female';
 };
 
 const randomVitals = () => ({
@@ -42,6 +43,8 @@ const generatePatientData = (post: any, index: number): PatientRow => {
     'Martinez',
   ];
 
+  const isMale = index % 2 === 0; // even = male, odd = female
+
   const name = `${firstNames[index % firstNames.length]} ${
     lastNames[index % lastNames.length]
   }`;
@@ -53,6 +56,7 @@ const generatePatientData = (post: any, index: number): PatientRow => {
     name,
     age,
     room,
+    gender: isMale ? 'Male' : 'Female',
     ...randomVitals(),
   };
 };
